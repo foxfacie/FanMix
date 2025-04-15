@@ -1,11 +1,12 @@
 "use client";
 
-import { useInfiniteNewAnime } from '@/lib/api/vidapi';
+import { useInfiniteNewAnime, type Anime, type AnimeResponse } from '@/lib/api/vidapi';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Star, Play, Plus, Info } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 import { useEffect } from 'react';
+import { InfiniteData } from '@tanstack/react-query';
 
 export function AnimeGrid() {
   const { ref, inView } = useInView();

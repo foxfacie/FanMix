@@ -10,7 +10,7 @@ export interface Anime {
   rating?: number;
 }
 
-interface AnimeResponse {
+export interface AnimeResponse {
   data: Anime[];
   pagination?: {
     currentPage: number;
@@ -50,7 +50,7 @@ export function useNewAnime(page: number = 1) {
     queryKey: ['newAnime', page],
     queryFn: () => fetchAnimeData('/new', { page: page.toString() }),
     staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
-    cacheTime: 30 * 60 * 1000, // Keep data in cache for 30 minutes
+    gcTime: 30 * 60 * 1000, // Keep data in cache for 30 minutes (renamed from cacheTime in v5)
   });
 }
 
@@ -58,14 +58,15 @@ export function useNewAnime(page: number = 1) {
  * Hook for infinite scrolling of new anime releases
  */
 export function useInfiniteNewAnime() {
-  return useInfiniteQuery({
+  return useInfiniteQuery<AnimeResponse>({
     queryKey: ['infiniteNewAnime'],
     queryFn: ({ pageParam = 1 }) => 
-      fetchAnimeData('/new', { page: pageParam.toString() }),
-    getNextPageParam: (lastPage) => 
+      fetchAnimeData('/new', { page: String(pageParam) }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: AnimeResponse) => 
       lastPage.pagination?.hasNextPage ? lastPage.pagination.currentPage + 1 : undefined,
     staleTime: 5 * 60 * 1000,
-    cacheTime: 30 * 60 * 1000,
+    gcTime: 30 * 60 * 1000, // Renamed from cacheTime in v5
   });
 }
 
@@ -85,6 +86,6 @@ export function getErrorMessage(error: unknown): string {
 export const API_CONFIG = {
   RETRY_COUNT: 3,
   RETRY_DELAY: 1000,
-  CACHE_TIME: 30 * 60 * 1000,
+  GC_TIME: 30 * 60 * 1000, // Renamed from CACHE_TIME
   STALE_TIME: 5 * 60 * 1000,
 } as const;
